@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:g="http://www.jboss.org/drools/flow/gpd" xmlns:tns="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="Definition" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.jboss.org/drools" typeLanguage="http://www.java.com/javaTypes">
+  <bpmn2:itemDefinition id="_countItem" structureRef="Integer"/>
+  <bpmn2:itemDefinition id="_loopconditionItem" structureRef="java.lang.Integer"/>
+  <bpmn2:itemDefinition id="_hpmItem" structureRef="com.sample.HelloProcessModel"/>
+  <bpmn2:itemDefinition id="_userlocationItem" structureRef="java.lang.String"/>
+  <bpmn2:process id="looptest777" tns:version="1" tns:packageName="defaultPackage" tns:adHoc="false" name="looptest777.b" isExecutable="true" processType="Private">
+    <bpmn2:property id="count" itemSubjectRef="_countItem"/>
+    <bpmn2:property id="loopcondition" itemSubjectRef="_loopconditionItem"/>
+    <bpmn2:property id="hpm" itemSubjectRef="_hpmItem"/>
+    <bpmn2:property id="userlocation" itemSubjectRef="_userlocationItem"/>
+    <bpmn2:exclusiveGateway id="_5" name="Gateway" gatewayDirection="Diverging">
+      <bpmn2:incoming>_4-_5</bpmn2:incoming>
+      <bpmn2:outgoing>_5-_7</bpmn2:outgoing>
+      <bpmn2:outgoing>_5-_8</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="_5-_7" tns:priority="1" name="loop back" sourceRef="_5" targetRef="_7">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" id="FormalExpression_1">return count &lt; loopcondition;</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="_5-_8" tns:priority="1" name="otherwise" sourceRef="_5" targetRef="_8">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" id="FormalExpression_2" language="http://www.jboss.org/drools/rule">eval(true)</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:scriptTask id="_4" name="Hello Again">
+      <bpmn2:incoming>_10-_4</bpmn2:incoming>
+      <bpmn2:outgoing>_4-_5</bpmn2:outgoing>
+      <bpmn2:script>System.out.println(&quot;Hello Again&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="_4-_5" tns:priority="1" sourceRef="_4" targetRef="_5"/>
+    <bpmn2:scriptTask id="_7" name="Hello Back">
+      <bpmn2:incoming>_5-_7</bpmn2:incoming>
+      <bpmn2:outgoing>_7-_10</bpmn2:outgoing>
+      <bpmn2:script>System.out.println(&quot;Hello back&quot;);
+
+count += 1;
+
+System.out.println(&quot;count: &quot; + count);
+kcontext.setVariable(&quot;count&quot;, count);
+</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="_7-_10" tns:priority="1" sourceRef="_7" targetRef="_10"/>
+    <bpmn2:scriptTask id="_2" name="Hello" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>_1-_2</bpmn2:incoming>
+      <bpmn2:outgoing>_2-_14</bpmn2:outgoing>
+      <bpmn2:script>System.out.print(&quot;start the flow for &quot; +hpm.getUserlocation() + &quot;  with count: &quot; +hpm.getCount());
+kcontext.getKnowledgeRuntime().insert(hpm);
+</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="_2-_14" tns:priority="1" sourceRef="_2" targetRef="_14"/>
+    <bpmn2:businessRuleTask id="_14" tns:ruleFlowGroup="" g:ruleFlowGroup="EvalLoopcondition" name="LoopConditionRules">
+      <bpmn2:extensionElements>
+        <tns:onEntry-script scriptFormat="http://www.java.com/java">
+          <tns:script></tns:script>
+        </tns:onEntry-script>
+        <tns:onExit-script scriptFormat="http://www.java.com/java">
+          <tns:script></tns:script>
+        </tns:onExit-script>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>_2-_14</bpmn2:incoming>
+      <bpmn2:outgoing>_14-_15</bpmn2:outgoing>
+    </bpmn2:businessRuleTask>
+    <bpmn2:sequenceFlow id="_14-_15" tns:priority="1" sourceRef="_14" targetRef="_15"/>
+    <bpmn2:scriptTask id="_15" name="SetRuleCondition" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>_14-_15</bpmn2:incoming>
+      <bpmn2:outgoing>_15-_10</bpmn2:outgoing>
+      <bpmn2:script>count = hpm.getCount();
+loopcondition = hpm.getLoopcondition();
+
+System.out.println(&quot;   with  loop condition: &quot; +loopcondition);
+kcontext.setVariable(&quot;count&quot;, count);
+kcontext.setVariable(&quot;loopcondition&quot;, loopcondition);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="_15-_10" tns:priority="1" sourceRef="_15" targetRef="_10"/>
+    <bpmn2:startEvent id="_1" name="Start">
+      <bpmn2:outgoing>_1-_2</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="_1-_2" tns:priority="1" sourceRef="_1" targetRef="_2"/>
+    <bpmn2:scriptTask id="_8" name="Hello Post">
+      <bpmn2:incoming>_5-_8</bpmn2:incoming>
+      <bpmn2:outgoing>_8-_6</bpmn2:outgoing>
+      <bpmn2:script>System.out.println(&quot;Hello Post &quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="_8-_6" tns:priority="1" sourceRef="_8" targetRef="_6"/>
+    <bpmn2:exclusiveGateway id="_10" name="Gateway" gatewayDirection="Converging">
+      <bpmn2:incoming>_7-_10</bpmn2:incoming>
+      <bpmn2:incoming>_15-_10</bpmn2:incoming>
+      <bpmn2:outgoing>_10-_4</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="_10-_4" tns:priority="1" sourceRef="_10" targetRef="_4"/>
+    <bpmn2:endEvent id="_6" name="End">
+      <bpmn2:incoming>_8-_6</bpmn2:incoming>
+      <bpmn2:terminateEventDefinition id="TerminateEventDefinition_1"/>
+    </bpmn2:endEvent>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="looptest777">
+      <bpmndi:BPMNShape id="BPMNShape_StartEvent_1" bpmnElement="_1">
+        <dc:Bounds height="48.0" width="48.0" x="20.0" y="203.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_1" bpmnElement="_5">
+        <dc:Bounds height="48.0" width="48.0" x="760.0" y="225.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_2" bpmnElement="_10">
+        <dc:Bounds height="48.0" width="48.0" x="543.0" y="203.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_1" bpmnElement="_6">
+        <dc:Bounds height="48.0" width="48.0" x="1010.0" y="225.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_2" bpmnElement="_4">
+        <dc:Bounds height="48.0" width="80.0" x="630.0" y="142.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_3" bpmnElement="_7">
+        <dc:Bounds height="48.0" width="80.0" x="640.0" y="281.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_1" bpmnElement="_2">
+        <dc:Bounds height="48.0" width="80.0" x="120.0" y="202.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_BusinessRuleTask_1" bpmnElement="_14">
+        <dc:Bounds height="61.0" width="103.0" x="240.0" y="195.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_5" bpmnElement="_15">
+        <dc:Bounds height="48.0" width="120.0" x="380.0" y="202.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ScriptTask_4" bpmnElement="_8">
+        <dc:Bounds height="48.0" width="80.0" x="880.0" y="225.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="_1-_2">
+        <di:waypoint xsi:type="dc:Point" x="68.0" y="227.0"/>
+        <di:waypoint xsi:type="dc:Point" x="91.0" y="227.0"/>
+        <di:waypoint xsi:type="dc:Point" x="91.0" y="226.0"/>
+        <di:waypoint xsi:type="dc:Point" x="120.0" y="226.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="_10-_4">
+        <di:waypoint xsi:type="dc:Point" x="567.0" y="203.0"/>
+        <di:waypoint xsi:type="dc:Point" x="567.0" y="166.0"/>
+        <di:waypoint xsi:type="dc:Point" x="630.0" y="166.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="_4-_5">
+        <di:waypoint xsi:type="dc:Point" x="710.0" y="166.0"/>
+        <di:waypoint xsi:type="dc:Point" x="784.0" y="166.0"/>
+        <di:waypoint xsi:type="dc:Point" x="784.0" y="225.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="_8-_6">
+        <di:waypoint xsi:type="dc:Point" x="960.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="982.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="982.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="1010.0" y="249.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="_5-_7">
+        <di:waypoint xsi:type="dc:Point" x="784.0" y="274.0"/>
+        <di:waypoint xsi:type="dc:Point" x="784.0" y="305.0"/>
+        <di:waypoint xsi:type="dc:Point" x="720.0" y="305.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="_5-_8">
+        <di:waypoint xsi:type="dc:Point" x="809.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="840.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="840.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="880.0" y="249.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="_7-_10">
+        <di:waypoint xsi:type="dc:Point" x="640.0" y="305.0"/>
+        <di:waypoint xsi:type="dc:Point" x="567.0" y="305.0"/>
+        <di:waypoint xsi:type="dc:Point" x="567.0" y="252.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="_15-_10">
+        <di:waypoint xsi:type="dc:Point" x="500.0" y="226.0"/>
+        <di:waypoint xsi:type="dc:Point" x="519.0" y="226.0"/>
+        <di:waypoint xsi:type="dc:Point" x="519.0" y="227.0"/>
+        <di:waypoint xsi:type="dc:Point" x="543.0" y="227.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_9" bpmnElement="_2-_14">
+        <di:waypoint xsi:type="dc:Point" x="200.0" y="226.0"/>
+        <di:waypoint xsi:type="dc:Point" x="218.0" y="226.0"/>
+        <di:waypoint xsi:type="dc:Point" x="218.0" y="225.0"/>
+        <di:waypoint xsi:type="dc:Point" x="240.0" y="225.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_10" bpmnElement="_14-_15">
+        <di:waypoint xsi:type="dc:Point" x="343.0" y="225.0"/>
+        <di:waypoint xsi:type="dc:Point" x="359.0" y="225.0"/>
+        <di:waypoint xsi:type="dc:Point" x="359.0" y="226.0"/>
+        <di:waypoint xsi:type="dc:Point" x="380.0" y="226.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
